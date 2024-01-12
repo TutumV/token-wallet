@@ -1,30 +1,12 @@
-import {ethers} from 'ethers';
-import {TokenModel} from '../models/token.js';
+import joi from 'joi';
 
+export const walletValidator = joi.object({
+  address: joi.string().trim().required(),
+  amount: joi.number().min(0).required(),
+  tokenID: joi.number(),
+  weiGasPrice: joi.number().min(0),
+});
 
-export class WalletValidator {
-  static async sendValidate(address, amount, tokenID) {
-    if (!ethers.isAddress(address)) {
-      throw Error('Not valid address');
-    }
-    if (typeof amount !== 'string') {
-      throw Error('Amount must be string');
-    }
-    if (isNaN(Number(amount))) {
-      throw Error('Amount is not a number');
-    }
-    if (tokenID) {
-      const token = await TokenModel.findByPk(tokenID);
-      if (!token) {
-        throw Error('Token not found');
-      }
-      return token;
-    }
-  }
-
-  static async createValidate(mnemonic) {
-    if (mnemonic && !ethers.Mnemonic.isValidMnemonic(mnemonic)) {
-      throw new Error('Invalid Mnemonic');
-    }
-  }
-}
+export const createWalletValidator = joi.object({
+  mnemonic: joi.string(),
+});

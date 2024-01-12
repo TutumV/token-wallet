@@ -1,7 +1,8 @@
 import {Router} from 'express';
 import {WalletModel} from '../models/wallet.js';
 import {WalletController} from '../controllers/wallet.js';
-import {WalletValidator} from '../validators/wallet.js';
+import {walletValidator, createWalletValidator} from '../validators/wallet.js';
+import {ethers} from 'ethers';
 
 const WalletRouter = Router();
 
@@ -49,11 +50,11 @@ const WalletRouter = Router();
  *         description: Any Error
  *         content:
  *           application/json:
- *           schema:
- *             type: object
- *             properties:
- *              error:
- *                type: string
+ *             schema:
+ *               type: object
+ *               properties:
+ *                error:
+ *                  type: string
  *   get:
  *     summary: Wallets List View
  *     operationId: wallets_view_get
@@ -91,10 +92,11 @@ WalletRouter.route('/')
   })
   .post(async (req, res) => {
     try {
-      const {mnemonic} = req.body;
-      await WalletValidator.createValidate(mnemonic);
-
-      const instance = await WalletController.create(mnemonic);
+      const data = await createWalletValidator.validateAsync(req.body);
+      if (data.mnemonic && !ethers.Mnemonic.isValidMnemonic(data.mnemonic)) {
+        return res.status(400).send({error: 'Invalid Mnemonic'});
+      }
+      const instance = await WalletController.create(data.mnemonic);
       return res.status(201).send(instance);
     } catch (err) {
       return res.status(400).send({error: err.message});
@@ -121,6 +123,8 @@ WalletRouter.route('/')
  *                 type: string
  *               amount:
  *                 type: string
+ *               weiGasPrice:
+ *                 type: integer
  *               tokenID:
  *                 anyOf:
  *                   - type: integer
@@ -226,8 +230,10 @@ WalletRouter.route('/detail/:id')
   })
   .post(async (req, res) => {
     try {
-      const {address, amount, tokenID} = req.body;
-      await WalletValidator.sendValidate(address, amount, tokenID);
+      const data = await walletValidator.validateAsync(req.body);
+      if (!ethers.isAddress(data.address)) {
+        return res.status(400).send({error: 'Not valid address'});
+      }
       const instance = await WalletModel.findByPk(req.params.id);
       if (!instance) {
         return res.status(404).send({error: 'Wallet not found'});
@@ -235,7 +241,7 @@ WalletRouter.route('/detail/:id')
 
       const result = await new WalletController(
         instance,
-      ).send(address, amount, tokenID);
+      ).send(data.address, data.amount, data.tokenID, data.weiGasPrice.toString());
       return res.status(201).send(result);
     } catch (err) {
       return res.status(400).send({error: err.message});

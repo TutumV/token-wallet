@@ -1,16 +1,8 @@
-import {ethers} from 'ethers';
+import joi from 'joi';
 
 
-export class TokenValidator {
-  static createValidate(address, coin, abi) {
-    if (!ethers.isAddress(address)) {
-      throw Error('Not valid address');
-    }
-    if (typeof coin !== 'string') {
-      throw Error('Coin must be string');
-    }
-    if (!Array.isArray(abi)) {
-      throw Error('ABI must be array');
-    }
-  }
-}
+export const createTokenValidator = joi.object({
+  address: joi.string().required(),
+  coin: joi.string().required(),
+  abi: joi.array().required(),
+});

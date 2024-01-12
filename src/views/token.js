@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {TokenModel} from '../models/token.js';
-import {TokenValidator} from '../validators/token.js';
+import {createTokenValidator} from '../validators/token.js';
+import {ethers} from 'ethers';
 
 const TokenRouter = Router();
 
@@ -78,28 +79,30 @@ const TokenRouter = Router();
  *                   type: string
  */
 TokenRouter.route('/')
-  .get(async (req, res) => {
-    const result = await TokenModel.findAll(
-      {attributes: ['id', 'address', 'coin']},
-    );
-    return res.send(result);
-  })
-  .post(async (req, res) => {
-    try {
-      const {address, coin, abi} = req.body;
-      TokenValidator.createValidate(address, coin, abi);
-      const [instance] = await TokenModel.findOrCreate({
-        where: {coin},
-        defaults: {
-          abi,
-          address,
-        },
-      });
-      return res.status(201).send(instance);
-    } catch (err) {
-      return res.status(400).send({error: err.message});
-    }
-  });
+    .get(async (req, res) => {
+      const result = await TokenModel.findAll(
+          {attributes: ['id', 'address', 'coin']},
+      );
+      return res.send(result);
+    })
+    .post(async (req, res) => {
+      try {
+        const data = await createTokenValidator.validateAsync(req.body);
+        if (!ethers.isAddress(data.address)) {
+          return res.status(400).send({error: 'Not valid address'});
+        }
+        const [instance] = await TokenModel.findOrCreate({
+          where: {coin: data.coin},
+          defaults: {
+            abi: data.abi,
+            address: data.address,
+          },
+        });
+        return res.status(201).send(instance);
+      } catch (err) {
+        return res.status(400).send({error: err.message});
+      }
+    });
 
 /**
  * @openapi
@@ -156,16 +159,16 @@ TokenRouter.route('/')
  *                  type: string
  */
 TokenRouter.route('/detail/:id')
-  .get(async (req, res) => {
-    const instance = await TokenModel.findByPk(req.params.id);
-    if (!instance) {
-      return res.status(404).send({error: 'Token Not Found'});
-    }
-    return res.send(instance);
-  })
-  .delete(async (req, res) => {
-    await TokenModel.destroy({where: {id: req.params.id}});
-    return res.status(204).send();
-  });
+    .get(async (req, res) => {
+      const instance = await TokenModel.findByPk(req.params.id);
+      if (!instance) {
+        return res.status(404).send({error: 'Token Not Found'});
+      }
+      return res.send(instance);
+    })
+    .delete(async (req, res) => {
+      await TokenModel.destroy({where: {id: req.params.id}});
+      return res.status(204).send();
+    });
 
 export {TokenRouter};

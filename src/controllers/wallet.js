@@ -11,81 +11,87 @@ export class WalletController {
     this.web3 = new Web3(config.node.url);
   }
 
-  async #sendToken(address, amount, tokenID) {
+  async #sendToken(address, amount, tokenID, gasPrice) {
     const token = await TokenModel.findByPk(tokenID);
+    if (!token.id) {
+      throw new Error('Token Not Found');
+    }
     const tokenBalance = await this.#tokenBalance(token);
     if (amount > tokenBalance) {
       throw new Error(
-        `Balance less amount. amount:${amount} balance:${tokenBalance}`,
+          `Balance less amount. amount:${amount} balance:${tokenBalance}`,
       );
     }
 
     const contract = new this.web3.eth.Contract(token.abi, token.address);
     const decimals = await contract.methods.decimals().call();
-
-    const gasPrice = await this.web3.eth.getGasPrice();
+    if (!gasPrice) {
+      gasPrice = await this.web3.eth.getGasPrice();
+    }
     const gasLimit = config.node.gasLimit;
     await this.#checkFee(gasPrice, gasLimit);
 
     const tokenAmount = amount * (10 ** decimals);
     const data = contract.methods.transfer(address, tokenAmount).encodeABI();
     const nonce = await this.web3.eth.getTransactionCount(
-      this.instance.address,
+        this.instance.address,
     );
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
-      {
-        to: token.address,
-        value: 0,
-        gas: gasLimit,
-        gasPrice: gasPrice,
-        nonce: nonce,
-        chainId: 1,
-        data: data,
-      },
-      this.instance.privateKey,
+        {
+          to: token.address,
+          value: 0,
+          gas: gasLimit,
+          gasPrice: gasPrice,
+          nonce: nonce,
+          chainId: 1,
+          data: data,
+        },
+        this.instance.privateKey,
     );
 
     const result = await this.web3.eth.sendSignedTransaction(
-      signedTx.rawTransaction,
+        signedTx.rawTransaction,
     );
     return {'txID': result.transactionHash};
   }
 
-  async #sendETH(address, amount) {
-    const gasPrice = await this.web3.eth.getGasPrice();
+  async #sendETH(address, amount, gasPrice) {
+    if (!gasPrice) {
+      gasPrice = await this.web3.eth.getGasPrice();
+    }
     const gasLimit = 21000;
     const weiAmount = this.web3.utils.toWei(amount);
     await this.#checkFee(gasPrice, gasLimit, weiAmount);
 
     const nonce = await this.web3.eth.getTransactionCount(
-      this.instance.address,
+        this.instance.address,
     );
     const signedTx = await this.web3.eth.accounts.signTransaction(
-      {
-        to: address,
-        value: weiAmount,
-        gas: gasLimit,
-        gasPrice: gasPrice,
-        nonce: nonce,
-        chainId: 1,
-      },
-      this.instance.privateKey,
+        {
+          to: address,
+          value: weiAmount,
+          gas: gasLimit,
+          gasPrice: gasPrice,
+          nonce: nonce,
+          chainId: 1,
+        },
+        this.instance.privateKey,
     );
     const result = await this.web3.eth.sendSignedTransaction(
-      signedTx.rawTransaction,
+        signedTx.rawTransaction,
     );
     return {'txID': result.transactionHash};
   }
 
-  async send(address, amount, tokenID) {
+  async send(address, amount, tokenID, gasPrice) {
     if (!this.web3.utils.checkAddressChecksum(address)) {
       address = this.web3.utils.toChecksumAddress(address);
     }
     if (tokenID) {
-      return await this.#sendToken(address, amount, tokenID);
+      return await this.#sendToken(address, amount, tokenID, gasPrice);
     } else {
-      return await this.#sendETH(address, amount);
+      return await this.#sendETH(address, amount, gasPrice);
     }
   }
 
@@ -99,7 +105,7 @@ export class WalletController {
     const required = this.web3.utils.fromWei(weiRequired, 'ether');
     if (weiRequired > weiBalance) {
       throw new Error(
-        `Insufficient funds required: ${required} balance: ${balance}`,
+          `Insufficient funds required: ${required} balance: ${balance}`,
       );
     }
   }
@@ -107,7 +113,7 @@ export class WalletController {
   async #tokenBalance(token) {
     const contract = new this.web3.eth.Contract(token.abi, token.address);
     const result = await contract.methods.balanceOf(
-      this.instance.address,
+        this.instance.address,
     ).call();
     const decimals = await contract.methods.decimals().call();
     return result / (10 ** decimals);
@@ -129,12 +135,12 @@ export class WalletController {
       });
     }
     return {
-      'id': this.instance.id,
-      'address': this.instance.address,
-      'mnemonic': this.instance.mnemonic,
-      'path': this.instance.path,
-      'balance': await this.#balance(),
-      'tokens': tokenData,
+      id: this.instance.id,
+      address: this.instance.address,
+      mnemonic: this.instance.mnemonic,
+      path: this.instance.path,
+      balance: await this.#balance(),
+      tokens: tokenData,
     };
   }
 
