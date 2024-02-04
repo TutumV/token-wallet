@@ -241,7 +241,7 @@ WalletRouter.route('/detail/:id')
 
       const result = await new WalletController(
         instance,
-      ).send(data.address, data.amount, data.tokenID, data.weiGasPrice.toString());
+      ).send(data.address, data.amount.toString(), data.tokenID, data.weiGasPrice.toString());
       return res.status(201).send(result);
     } catch (err) {
       return res.status(400).send({error: err.message});
