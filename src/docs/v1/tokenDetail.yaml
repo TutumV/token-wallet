@@ -1,0 +1,105 @@
+get:
+  tags:
+    - 'v1:token_detail'
+  summary: token detail
+  operationId: token_detail
+  parameters:
+    - name: id
+      in: path
+      required: true
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    address:
+                      type: string
+                    abi:
+                      type: array
+                    coin:
+                      type: string
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+delete:
+  tags:
+    - 'v1:token_delete'
+  summary: token delete
+  operationId: token_delete
+  parameters:
+    - name: id
+      in: path
+      required: true
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: object
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'

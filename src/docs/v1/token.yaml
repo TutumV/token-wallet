@@ -1,0 +1,124 @@
+post:
+  tags:
+    - 'v1:token_create'
+  summary: token create
+  operationId: token_create
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            address:
+              type: string
+            abi:
+              type: array
+              items:
+                type: object
+            coin:
+              type: string
+  responses:
+    '201':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  address:
+                    type: string
+                  abi:
+                    type: array
+                    items:
+                      type: object
+                  coin:
+                    type: string
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+get:
+  tags:
+    - 'v1:token_list'
+  summary: token list
+  operationId: token_list
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    address:
+                      type: string
+                    abi:
+                      type: array
+                      items:
+                        type: object
+                    coin:
+                      type: string
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'

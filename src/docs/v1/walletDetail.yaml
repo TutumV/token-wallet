@@ -1,0 +1,136 @@
+get:
+  tags:
+    - 'v1:wallet_detail'
+  summary: wallet balance
+  operationId: wallet_balance
+  parameters:
+    - name: id
+      in: path
+      required: true
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    address:
+                      type: string
+                    mnemonic:
+                      type: string
+                    path:
+                      type: string
+                    balance:
+                      type: string
+                    tokens:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                          coin:
+                            type: string
+                          balance:
+                            type: string
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+post:
+  tags:
+    - 'v1:wallet_send'
+  summary: send
+  operationId: send
+  parameters:
+    - name: id
+      in: path
+      required: true
+  requestBody:
+    content:
+      application/json:
+        schema:
+          required: [ 'address', 'amount' ]
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: number
+            tokenID:
+              type: number
+            weiGasPrice:
+              type: number
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: object
+                properties:
+                  txID:
+                    type: string
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'

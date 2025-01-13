@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: 'Token Wallet'
+  description: 'Token Wallet'
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:3000'
+paths:
+  # user
+  '/api/v1/token':
+    $ref: './v1/token.yaml'
+  '/api/v1/token/:id':
+    $ref: './v1/tokenDetail.yaml'
+  '/api/v1/wallet/':
+    $ref: './v1/wallet.yaml'
+  '/api/v1/wallet/:id':
+    $ref: './v1/walletDetail.yaml'

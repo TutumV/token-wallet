@@ -1,0 +1,130 @@
+post:
+  tags:
+    - 'v1:wallet_create'
+  summary: wallet create
+  operationId: wallet_create
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            mnemonic:
+              type: string
+  responses:
+    '201':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  address:
+                    type: string
+                  path:
+                    type: string
+                  mnemonic:
+                    type: string
+                  privateKey:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+get:
+  tags:
+    - 'v1:wallet_list'
+  summary: wallet list
+  operationId: wallet_list
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+              body:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    address:
+                      type: string
+                    path:
+                      type: string
+                    mnemonic:
+                      type: string
+                    privateKey:
+                      type: string
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+              message:
+                type: string
+    '400':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '401':
+      description: Authorization Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '403':
+      description: Permission Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'
+    '500':
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: './references/response.yaml'

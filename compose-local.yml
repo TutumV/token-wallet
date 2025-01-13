@@ -1,0 +1,14 @@
+name: token-wallet-local
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: wallet
+    volumes:
+      - ./data-local:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
